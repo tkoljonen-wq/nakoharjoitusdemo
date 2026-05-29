@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#9A5EA3">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<title>NäköHarjoitus — Silmäasema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f9;
+    --surface: #ffffff;
+    --surface2: #f3ecf5;
+    --border: #e5e0e8;
+    --accent: #9A5EA3;
+    --accent-dark: #7d4685;
+    --accent2: #b885c0;
+    --warn: #F06428;
+    --success: #2d7a4f;
+    --text: #323232;
+    --text-dim: #6b6660;
+    --text-faint: #a8a39d;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto Flex', 'Roboto', sans-serif;
+    font-variation-settings: 'wdth' 100;
+    letter-spacing: 0.01em;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(154,94,163,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(154,94,163,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; padding: 0 0 100px 0; }
+
+  /* HEADER */
+  .header {
+    padding: 24px 20px 20px;
+    position: relative;
+  }
+
+  .brand-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+
+  .brand-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .athlete-tag {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--surface2);
+    border: 1px solid rgba(154,94,163,0.2);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--warn);
+    background: rgba(240,100,40,0.08);
+    border: 1px solid rgba(240,100,40,0.25);
+    padding: 6px 12px;
+    border-radius: 100px;
+  }
+
+  .streak-fire { font-size: 14px; }
+
+  h1 {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .date-line {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-top: 10px;
+  }
+
+  /* TODAY CARD */
+  .today-card {
+    margin: 0 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .today-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .today-title {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .today-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .progress-text {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0 20px;
+    margin-bottom: 12px;
+  }
+
+  /* EXERCISE CARDS */
+  .exercises { padding: 0 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .rest-day-card {
+    margin: 0 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .rest-day-icon { font-size: 44px; margin-bottom: 14px; }
+  .rest-day-title { font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .rest-day-text { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+
+  .ex-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .ex-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(154,94,163,0.12);
+  }
+
+  .ex-card.done {
+    border-color: rgba(45,122,79,0.3);
+    background: rgba(45,122,79,0.04);
+  }
+
+  .ex-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .ex-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+
+  .ex-card.done .ex-icon { background: rgba(45,122,79,0.12); border-color: rgba(45,122,79,0.3); }
+
+  .ex-info { flex: 1; }
+
+  .ex-name { font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 3px; color: var(--text); }
+  .ex-meta {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex; gap: 10px;
+  }
+
+  .ex-status {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--text-faint);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .ex-card.done .ex-status {
+    background: var(--success);
+    border-color: var(--success);
+    color: #fff;
+  }
+
+  .log-section { margin-top: 12px; }
+
+  .log-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .log-row { display: flex; gap: 8px; margin-bottom: 8px; }
+
+  .log-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .log-input::placeholder { color: var(--text-faint); }
+  .log-input:focus { border-color: var(--accent); }
+
+  .log-input.narrow { max-width: 100px; text-align: center; }
+
+  .unit-badge {
+    display: flex; align-items: center;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0 4px;
+    white-space: nowrap;
+  }
+
+  .log-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Roboto Flex', 'Roboto', sans-serif;
+    font-size: 13px;
+    outline: none;
+    resize: none;
+    min-height: 70px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+
+  .log-textarea::placeholder { color: var(--text-faint); }
+  .log-textarea:focus { border-color: var(--accent); }
+
+  .done-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .done-btn:hover { background: var(--accent-dark); }
+  .done-btn:active { transform: scale(0.98); }
+
+  .done-btn.completed {
+    background: rgba(45,122,79,0.1);
+    color: var(--success);
+    border: 1px solid rgba(45,122,79,0.3);
+  }
+
+  /* EXERCISE MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(50,50,50,0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: none;
+  }
+
+  .modal-overlay.open { display: block; }
+
+  .modal-content {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 0 0 40px;
+    background: var(--bg);
+    box-shadow: 0 0 40px rgba(50,50,50,0.15);
+  }
+
+  .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding: 20px 20px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+
+  .modal-header-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .modal-header-text { flex: 1; min-width: 0; }
+  .modal-header-name { font-family: 'Roboto Condensed', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.2; color: var(--text); }
+  .modal-header-cat {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .modal-body { padding: 18px 20px; }
+
+  .modal-section { margin-bottom: 22px; }
+
+  .modal-section-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .modal-instructions {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dim);
+  }
+
+  .modal-instructions strong { color: var(--text); font-weight: 600; }
+
+  .modal-material {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .modal-material-title {
+    padding: 12px 16px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-pdf-frame {
+    width: 100%;
+    height: 360px;
+    border: none;
+    background: white;
+    display: block;
+  }
+
+  .modal-material-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: var(--surface2);
+  }
+
+  .modal-material-btn {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .modal-material-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-material-btn:active { transform: scale(0.97); }
+
+  /* WEEK CALENDAR */
+  .week-section { padding: 24px 20px 0; }
+
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .week-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+
+  .week-dot {
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface);
+  }
+
+  .week-dot.today {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--surface2);
+    font-weight: 600;
+  }
+
+  .week-dot.done-day {
+    background: rgba(45,122,79,0.1);
+    border-color: rgba(45,122,79,0.4);
+    color: var(--success);
+  }
+
+  .week-dot.rest {
+    opacity: 0.4;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 12px 0 28px;
+    z-index: 100;
+    box-shadow: 0 -2px 16px rgba(50,50,50,0.06);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    transition: opacity 0.2s;
+  }
+
+  .nav-icon { font-size: 20px; filter: grayscale(0.6); opacity: 0.6; transition: all 0.2s; }
+  .nav-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-btn.active .nav-icon { filter: none; opacity: 1; }
+  .nav-btn.active .nav-label { color: var(--accent); }
+
+  /* VIEWS */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* DIARY VIEW */
+  .diary-list { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  .diary-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .diary-date {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .diary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .diary-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .diary-ex-name { font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
+  .diary-result {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 12px;
+    color: var(--success);
+    text-align: right;
+  }
+  .diary-note {
+    font-family: 'Roboto Flex', sans-serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    text-align: right;
+    max-width: 140px;
+  }
+
+  /* STATS VIEW */
+  .stats-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(50,50,50,0.04);
+  }
+
+  .stat-value {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Notification banner */
+  .notif-banner {
+    margin: 0 20px 20px;
+    background: rgba(240,100,40,0.06);
+    border: 1px solid rgba(240,100,40,0.25);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    animation: slideIn 0.4s ease;
+  }
+
+  .notif-icon { font-size: 20px; flex-shrink: 0; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME VIEW -->
+  <div class="view active" id="view-home">
+    <div class="header">
+      <div class="brand-bar">
+        <img src="silmaasema-logo.jpg" alt="Silmäasema" class="brand-logo">
+      </div>
+      <div class="header-top" style="justify-content:flex-end">
+        <div class="streak-badge"><span class="streak-fire">🔥</span> <span id="streakCount">0</span> pv putki</div>
+      </div>
+      <h1 id="todayHeadline">Tänään on<br><span>harjoituspäivä</span></h1>
+      <div class="date-line" id="dateLine"><span class="live-dot"></span></div>
+    </div>
+
+    <div class="notif-banner" id="notifBanner">
+      <span class="notif-icon">👁️</span>
+      <span>Muista: tee harjoitukset ennen iltaa, mieluiten <strong>luonnonvalossa</strong> tai hyvässä valaistuksessa.</span>
+    </div>
+
+    <div class="today-card" id="todayCard">
+      <div class="today-label">Tämän päivän edistyminen</div>
+      <div class="today-title" id="todaySummary">— harjoitusta</div>
+      <div class="today-progress">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <div class="progress-text" id="progressText">0 / 0</div>
+      </div>
+    </div>
+
+    <div class="section-title" id="todayLabel">Harjoitukset</div>
+    <div class="exercises" id="exerciseList"></div>
+
+    <div class="week-section">
+      <div class="section-title" style="padding:0; margin-bottom:12px">Tämä viikko</div>
+      <div class="week-grid">
+        <div class="week-day"><div class="week-label">MA</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">TI</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">KE</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">TO</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">PE</div><div class="week-dot done-day">✓</div></div>
+        <div class="week-day"><div class="week-label">LA</div><div class="week-dot rest">—</div></div>
+        <div class="week-day"><div class="week-label">SU</div><div class="week-dot today">8</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIARY VIEW -->
+  <div class="view" id="view-diary">
+    <div class="header">
+      <div class="brand-bar">
+        <img src="silmaasema-logo.jpg" alt="Silmäasema" class="brand-logo">
+      </div>
+      <div class="header-top">
+        <div class="athlete-tag">Päiväkirja</div>
+      </div>
+      <h1>Harjoitus<br><span>historia</span></h1>
+    </div>
+    <div class="diary-list" id="diaryList"></div>
+  </div>
+
+  <!-- STATS VIEW -->
+  <div class="view" id="view-stats">
+    <div class="header">
+      <div class="brand-bar">
+        <img src="silmaasema-logo.jpg" alt="Silmäasema" class="brand-logo">
+      </div>
+      <div class="header-top">
+        <div class="athlete-tag">Tilastot</div>
+      </div>
+      <h1>Kehitys<br><span>seuranta</span></h1>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Harjoitusta yhteensä</div></div>
+      <div class="stat-card"><div class="stat-value" id="statStreak">5</div><div class="stat-label">Päivien putki</div></div>
+      <div class="stat-card"><div class="stat-value" id="statWeek">3</div><div class="stat-label">Tällä viikolla</div></div>
+      <div class="stat-card"><div class="stat-value" id="statRate">75%</div><div class="stat-label">Suoritusaste</div></div>
+    </div>
+    <div style="padding: 20px; margin-top: 8px;">
+      <div class="section-title" style="padding:0; margin-bottom:12px">Sakkadi — reaktioaika (ms)</div>
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; height:120px; display:flex; align-items:flex-end; gap:8px;">
+        <div id="chartBars" style="display:flex; align-items:flex-end; gap:8px; width:100%; height:100%;"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- EXERCISE MODAL -->
+<div class="modal-overlay" id="exerciseModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeExerciseModal()" aria-label="Sulje">✕</button>
+      <div class="modal-header-icon" id="modalIcon">🎯</div>
+      <div class="modal-header-text">
+        <div class="modal-header-name" id="modalName">—</div>
+        <div class="modal-header-cat" id="modalCat">—</div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" onclick="showView('home',this)">
+    <span class="nav-icon">👁️</span>
+    <span class="nav-label">Tänään</span>
+  </button>
+  <button class="nav-btn" onclick="showView('diary',this)">
+    <span class="nav-icon">📓</span>
+    <span class="nav-label">Päiväkirja</span>
+  </button>
+  <button class="nav-btn" onclick="showView('stats',this)">
+    <span class="nav-icon">📈</span>
+    <span class="nav-label">Kehitys</span>
+  </button>
+</div>
+
+<script src="lz-string.min.js"></script>
+<script>
+// ── LOAD PROGRAM FROM URL (and persist to localStorage so PWA reopens work) ──
+const PROGRAM_STORAGE_KEY = 'nakoharjoitusProgram';
+
+function loadProgramFromURL() {
+  // 1) Try URL hash (kun urheilija avaa jaetun linkin / QR-koodin)
+  try {
+    const hash = window.location.hash;
+    if (hash && hash.includes('program=')) {
+      const encoded = hash.split('program=')[1];
+      let parsed = null;
+      // Try LZString first (new format)
+      if (typeof LZString !== 'undefined') {
+        const decompressed = LZString.decompressFromEncodedURIComponent(encoded);
+        if (decompressed) parsed = JSON.parse(decompressed);
+      }
+      // Fallback: legacy btoa + encodeURIComponent
+      if (!parsed) parsed = JSON.parse(decodeURIComponent(atob(encoded)));
+      // Persist so PWA-opens ilman hashia toimivat
+      try { localStorage.setItem(PROGRAM_STORAGE_KEY, JSON.stringify(parsed)); } catch(e) {}
+      return parsed;
+    }
+  } catch(e) { console.warn('Could not parse program from URL', e); }
+  // 2) Fallback: aiemmin tallennettu ohjelma (PWA-uudelleenavaus aloitusnäytöltä)
+  try {
+    const saved = localStorage.getItem(PROGRAM_STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) { console.warn('Could not load program from storage', e); }
+  return null;
+}
+
+const URL_PROGRAM = loadProgramFromURL();
+
+// Use URL program exercises, or fall back to demo data
+const EXERCISES = URL_PROGRAM ? URL_PROGRAM.exercises : [
+  {
+    id: 'sakkadi',
+    name: 'Sakkadinen silmänliike',
+    icon: '↔️',
+    duration: '5 min',
+    sets: '3 sarjaa',
+    unit: 'ms',
+    unitLabel: 'reaktioaika (ms)',
+    instructions: `Aseta <strong>numerotaulu</strong> seinälle silmien korkeudelle noin 1 m etäisyydelle. Lue numerot 1–20 järjestyksessä mahdollisimman nopeasti liikuttaen vain silmiä, ei päätä. Pidä 30 s tauko sarjojen välillä. Mittaa aika tai laske virheet.`
+  },
+  {
+    id: 'silmakasi',
+    name: 'Silmä-käsikoordinaatio',
+    icon: '🎯',
+    duration: '6 min',
+    sets: '4 sarjaa',
+    unit: 'pisteet',
+    unitLabel: 'osumia / 20',
+    instructions: `Pomppaa <strong>tennispallo</strong> seinään ja ota kiinni yhdellä kädellä vuorotellen. Etäisyys n. 2 m. Vaikeuta lisäämällä rytmi tai sulkemalla toinen silmä. Laske onnistuneet kiinniotot per sarja.`
+  },
+  {
+    id: 'akkomodaatio',
+    name: 'Akkomodaatio (lähi-kauko)',
+    icon: '🔭',
+    duration: '4 min',
+    sets: '3 sarjaa',
+    unit: 's',
+    unitLabel: 'tarkennusaika (s)',
+    instructions: `Pidä <strong>kynää</strong> 10 cm silmistä ja katso vuorotellen kynän kärkeä ja kaukaista kohdetta (>5 m). Laske hitaasti 3 sekuntia per kohde. Kun vaihdat, huomioi kuinka nopeasti kuva tarkentuu.`
+  },
+  {
+    id: 'brock',
+    name: "Brockin lanka",
+    icon: '🪢',
+    cat: 'Binokulaarisuus',
+    duration: '5 min',
+    sets: '1 sarja',
+    unit: 'min',
+    unitLabel: 'harjoituksen kesto (min)',
+    instructions: `<strong>Tarvikkeet:</strong> n. 1 m lanka ja 3 erivärisiä helmiä.<br><br><strong>Valmistelu:</strong> Kiinnitä langan toinen pää kiinteään kohtaan (esim. ovenkahva). Aseta helmet eri etäisyyksille: yksi lähelle nenää (~10 cm), yksi keskelle, yksi kauas. Pidä langan toinen pää nenän kärjessä.<br><br><strong>Vaiheet:</strong><br>1. Katso kauimmaista helmeä — langan pitäisi näyttää jakautuvan kahtia (X-kuvio helmen kohdalla). Etummaiset helmet näkyvät kahtena.<br>2. Siirrä katse keskimmäiseen helmeen — X-kuvio siirtyy sen kohdalle.<br>3. Siirrä katse lähimpään helmeen — X-kuvio muodostuu sen kohdalla.<br>4. Toista hitaasti edestakaisin: kauas → keskelle → lähelle → takaisin.<br><br><strong>Variaatio:</strong> tee harjoitus myös eri kulmissa, esim. yläviistoon.<br><br><strong>Tavoite:</strong> parantaa silmien kykyä kääntyä hallitusti ja tarkentaa lähelle ja kauas.<br><br><em>Tarkemmat valokuvalliset ohjeet: katso PDF alla.</em>`,
+    materiaalit: [
+      { nimi: 'Harjoitusohje valokuvineen (PDF)', tiedosto: 'brock-lanka-ohje.pdf' }
+    ]
+  }
+];
+
+// Simulate saved diary data
+const DIARY_DATA = [
+  {
+    date: '2026-03-06',
+    dateLabel: 'PE 06.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '420 ms', note: 'Parempi kuin viimeksi' },
+      { name: 'Akkomodaatio (lähi-kauko)', result: '1.8 s', note: '' },
+      { name: 'Brockin lanka', result: '22 cm', note: 'Vasen silmä dominoi' },
+    ]
+  },
+  {
+    date: '2026-03-04',
+    dateLabel: 'KE 04.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '450 ms', note: '' },
+      { name: 'Silmä-käsikoordinaatio', result: '16/20', note: 'Oikea käsi parempi' },
+    ]
+  },
+  {
+    date: '2026-03-02',
+    dateLabel: 'MA 02.03.2026',
+    entries: [
+      { name: 'Sakkadinen silmänliike', result: '480 ms', note: 'Ensimmäinen kerta' },
+      { name: 'Brockin lanka', result: '28 cm', note: '' },
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let completed = {};
+let modalExId = null; // id of exercise currently open in modal
+let TODAY_EXERCISES = []; // populated by applyTodaySchedule() in init
+
+// 0=Mon, 1=Tue, ..., 6=Sun — matches admin.html convention
+const DAY_NAMES_LONG = ['maanantai','tiistai','keskiviikko','torstai','perjantai','lauantai','sunnuntai'];
+
+function computeTodayExercises(dayIdx) {
+  const defaultDays = URL_PROGRAM?.schedule?.days ?? [0,1,2,3,4,5,6];
+  return EXERCISES.filter(ex => {
+    const days = Array.isArray(ex.days) && ex.days.length > 0 ? ex.days : defaultDays;
+    return days.includes(dayIdx);
+  });
+}
+
+function applyTodaySchedule(dayIdx) {
+  TODAY_EXERCISES = computeTodayExercises(dayIdx);
+  const isRestDay = TODAY_EXERCISES.length === 0;
+  const headline = document.getElementById('todayHeadline');
+  const todayCard = document.getElementById('todayCard');
+  const todayLabel = document.getElementById('todayLabel');
+  const notif = document.getElementById('notifBanner');
+  const todaySummary = document.getElementById('todaySummary');
+
+  if (isRestDay) {
+    headline.innerHTML = 'Tänään on<br><span>lepopäivä</span>';
+    todayCard.style.display = 'none';
+    todayLabel.style.display = 'none';
+    notif.style.display = 'none';
+  } else {
+    headline.innerHTML = 'Tänään on<br><span>harjoituspäivä</span>';
+    todayCard.style.display = '';
+    todayLabel.style.display = '';
+    notif.style.display = '';
+    todaySummary.textContent = `${TODAY_EXERCISES.length} harjoitus${TODAY_EXERCISES.length === 1 ? '' : 'ta'}`;
+    todayLabel.textContent = `Harjoitukset — ${DAY_NAMES_LONG[dayIdx]}`;
+  }
+}
+
+// ── BUILD EXERCISE LIST ───────────────────────────────────────────────────
+function buildExercises() {
+  const container = document.getElementById('exerciseList');
+  container.innerHTML = '';
+
+  if (TODAY_EXERCISES.length === 0) {
+    container.innerHTML = `
+      <div class="rest-day-card">
+        <div class="rest-day-icon">🌙</div>
+        <div class="rest-day-title">Tänään ei ole harjoituksia</div>
+        <div class="rest-day-text">Lepää ja palaa ohjelman seuraavana harjoituspäivänä.</div>
+      </div>`;
+    updateProgress();
+    return;
+  }
+
+  TODAY_EXERCISES.forEach((ex) => {
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (completed[ex.id] ? ' done' : '');
+    card.id = 'card-' + ex.id;
+    card.onclick = () => openExerciseModal(ex.id);
+
+    card.innerHTML = `
+      <div class="ex-header">
+        <div class="ex-icon">${ex.icon}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-meta">
+            <span>⏱ ${ex.duration}</span>
+            <span>${ex.sets}</span>
+          </div>
+        </div>
+        <div class="ex-status">${completed[ex.id] ? '✓' : '›'}</div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  updateProgress();
+}
+
+// ── EXERCISE MODAL ────────────────────────────────────────────────────────
+function fileExt(name) { return (name.split('.').pop() || '').toLowerCase(); }
+
+function openExerciseModal(id) {
+  const ex = TODAY_EXERCISES.find(e => e.id === id);
+  if (!ex) return;
+  modalExId = id;
+  const prev = completed[id] || { num: '', note: '' };
+
+  document.getElementById('modalIcon').textContent = ex.icon;
+  document.getElementById('modalName').textContent = ex.name;
+  document.getElementById('modalCat').textContent = `${ex.cat} · ${ex.sets} · ${ex.duration}`;
+
+  const body = document.getElementById('modalBody');
+  const matsHtml = (ex.materiaalit?.length ? ex.materiaalit.map(m => {
+    const ext = fileExt(m.tiedosto);
+    const url = `./materiaalit/${m.tiedosto}`;
+    const isPdf = ext === 'pdf';
+    return `
+      <div class="modal-material">
+        <div class="modal-material-title">📄 ${m.nimi}</div>
+        <iframe class="modal-pdf-frame" src="${url}" title="${m.nimi}" loading="lazy"></iframe>
+        <div class="modal-material-actions">
+          <a class="modal-material-btn" href="${url}" target="_blank" rel="noopener">🔗 Avaa</a>
+          ${isPdf ? `<a class="modal-material-btn" href="${url}" download>📥 Lataa PDF</a>` : ''}
+        </div>
+      </div>`;
+  }).join('') : '');
+
+  body.innerHTML = `
+    ${ex.instructions ? `
+    <div class="modal-section">
+      <div class="modal-section-label">Ohje</div>
+      <div class="modal-instructions">${ex.instructions}</div>
+    </div>` : ''}
+    ${matsHtml ? `
+    <div class="modal-section">
+      <div class="modal-section-label">Tulostettavat materiaalit</div>
+      ${matsHtml}
+    </div>` : ''}
+    <div class="modal-section">
+      <div class="modal-section-label">Kirjaa tulos</div>
+      <div class="log-row">
+        <input class="log-input narrow" id="modalNum" type="number" placeholder="—" inputmode="decimal" value="${prev.num || ''}">
+        <div class="unit-badge">${ex.unitLabel || ''}</div>
+      </div>
+      <div class="log-label" style="margin-top:10px">Muistiinpano (vapaaehtoinen)</div>
+      <textarea class="log-textarea" id="modalNote" placeholder="Esim. vasen silmä väsyi, parempi kuin eilen...">${prev.note || ''}</textarea>
+    </div>
+    <button class="done-btn ${completed[id] ? 'completed' : ''}" onclick="markDoneFromModal()">
+      ${completed[id] ? '✓ Merkitty tehdyksi' : 'Merkitse tehdyksi'}
+    </button>
+  `;
+
+  document.getElementById('exerciseModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExerciseModal() {
+  document.getElementById('exerciseModal').classList.remove('open');
+  document.body.style.overflow = '';
+  modalExId = null;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modalExId) closeExerciseModal();
+});
+
+document.getElementById('exerciseModal')?.addEventListener('click', e => {
+  if (e.target.id === 'exerciseModal') closeExerciseModal();
+});
+
+function markDoneFromModal() {
+  if (!modalExId) return;
+  const num = document.getElementById('modalNum')?.value || '';
+  const note = document.getElementById('modalNote')?.value || '';
+  completed[modalExId] = { num, note, time: new Date().toISOString() };
+  try { localStorage.setItem(todayKey, JSON.stringify(completed)); } catch(e) {}
+  closeExerciseModal();
+  buildExercises();
+}
+
+function updateProgress() {
+  const total = TODAY_EXERCISES.length;
+  const todayIds = new Set(TODAY_EXERCISES.map(ex => ex.id));
+  const done = Object.keys(completed).filter(id => todayIds.has(id)).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const fill = document.getElementById('progressFill');
+  const text = document.getElementById('progressText');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = done + ' / ' + total;
+  document.getElementById('statTotal').textContent = done + 12; // simulate history
+}
+
+// ── DIARY ─────────────────────────────────────────────────────────────────
+function buildDiary() {
+  const container = document.getElementById('diaryList');
+  container.innerHTML = '';
+  DIARY_DATA.forEach(day => {
+    const el = document.createElement('div');
+    el.className = 'diary-entry';
+    el.innerHTML = `
+      <div class="diary-date">${day.dateLabel}</div>
+      ${day.entries.map(e => `
+        <div class="diary-item">
+          <div class="diary-ex-name">${e.name}</div>
+          <div>
+            <div class="diary-result">${e.result}</div>
+            ${e.note ? `<div class="diary-note">${e.note}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    `;
+    container.appendChild(el);
+  });
+}
+
+// ── STATS CHART ───────────────────────────────────────────────────────────
+function buildChart() {
+  const data = [480, 450, null, 420, null, 410, null]; // Mon–Sun, nulls = rest
+  const days = ['MA','TI','KE','TO','PE','LA','SU'];
+  const max = 500;
+  const container = document.getElementById('chartBars');
+  container.innerHTML = '';
+  data.forEach((v, i) => {
+    const col = document.createElement('div');
+    col.style.cssText = 'flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; height:100%;';
+    if (v !== null) {
+      const h = Math.round((v / max) * 100);
+      col.innerHTML = `
+        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--accent)">${v}</div>
+        <div style="width:100%;height:${h}%;background:linear-gradient(180deg,var(--accent2),var(--accent));border-radius:6px 6px 2px 2px;min-height:4px;"></div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+      `;
+    } else {
+      col.innerHTML = `
+        <div style="width:100%;height:4px;"></div>
+        <div style="width:100%;height:4%;background:var(--border);border-radius:3px;"></div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:8px;color:var(--text-faint)">${days[i]}</div>
+      `;
+    }
+    container.appendChild(col);
+  });
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+
+const now = new Date();
+const fDays = ['SU','MA','TI','KE','TO','PE','LA'];
+const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(),0,1))/86400000) + 1) / 7);
+document.getElementById('dateLine').innerHTML =
+  '<span class="live-dot"></span>' + fDays[now.getDay()] + ' ' +
+  String(now.getDate()).padStart(2,'0') + '.' +
+  String(now.getMonth()+1).padStart(2,'0') + '.' + now.getFullYear() +
+  ' — Viikko ' + weekNum;
+
+// Load today's completions (keyed by date so resets each day)
+const todayKey = 'completed_' + now.toISOString().split('T')[0];
+try {
+  const saved = localStorage.getItem(todayKey);
+  if (saved) completed = JSON.parse(saved);
+} catch(e) {}
+
+// Compute streak from localStorage
+let streak = 0;
+for (let i = 1; i <= 60; i++) {
+  const d = new Date(now); d.setDate(d.getDate() - i);
+  const k = 'completed_' + d.toISOString().split('T')[0];
+  try {
+    const val = localStorage.getItem(k);
+    if (val && Object.keys(JSON.parse(val)).length > 0) streak++;
+    else break;
+  } catch(e) { break; }
+}
+document.getElementById('streakCount').textContent = streak;
+
+// Compute today's exercises based on per-exercise days override or program default
+const todayDayIdx = (now.getDay() + 6) % 7; // JS Sun=0..Sat=6 → Mon=0..Sun=6
+applyTodaySchedule(todayDayIdx);
+
+buildExercises();
+buildDiary();
+buildChart();
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => {
+      console.warn('SW-rekisteröinti epäonnistui:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
